@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-import 'page/schedule/schdule_screen.dart';
+import 'page/schedule/schedule_screen.dart';
 import 'page/map/map_screen.dart';
 
 void main() {
