@@ -32,6 +32,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 강의실 마커 표시
     final List<Marker> markers = getMarkersData().map((data) {
       return Marker(
         markerId: MarkerId(data['id']),
@@ -43,9 +44,38 @@ class _MapScreenState extends State<MapScreen> {
       );
     }).toList();
 
-    final List<Edge> edges = getEdgesData(); // 엣지 정보
+    final graph = Graph(nodes: nodes, edges: edges); // 그래프 초기화
 
+    // 모든 간선 표시하기
     final List<Polyline> polylines = edges.map((edge) {
+      return Polyline(
+        polylineId: PolylineId('${edge.startNodeId}-${edge.endNodeId}'),
+        color: Colors.blue,
+        points: edge.coordinates,
+        width: 8,
+      );
+    }).toList();
+
+
+    String startNodeId = '미래관';
+    String endNodeId = '다빈치관';
+
+    List<Edge> shortestPath = dijkstra(graph, startNodeId, endNodeId);
+
+    if (shortestPath.isNotEmpty) {
+      print('Shortest path from $startNodeId to $endNodeId:');
+      double totalDistance = 0;
+      for (var edge in shortestPath) {
+        print('${edge.startNodeId} to ${edge.endNodeId}: ${edge.length} km');
+        totalDistance += edge.length;
+      }
+      print('Total distance: $totalDistance km');
+    } else {
+      print('No path found from $startNodeId to $endNodeId');
+    }
+
+    // 모든 간선 표시하기
+    final List<Polyline> route = shortestPath.map((edge) {
       return Polyline(
         polylineId: PolylineId('${edge.startNodeId}-${edge.endNodeId}'),
         color: Colors.blue,
@@ -69,8 +99,8 @@ class _MapScreenState extends State<MapScreen> {
             target: _center,
             zoom: 16.5,
           ),
-          markers: Set<Marker>.from(markers + nodeMarkers),
-          polylines: Set<Polyline>.from(polylines),
+          markers: Set<Marker>.from(nodeMarkers),
+          polylines: Set<Polyline>.from(route),
         ),
       ),
     );

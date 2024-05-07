@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:collection/collection.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 //건물 마커 목록
@@ -110,30 +112,36 @@ class Edge {
   final String startNodeId; // 시작 노드의 식별자
   final String endNodeId; // 끝 노드의 식별자
   final List<LatLng> coordinates; // 시작 노드부터 끝 노드까지의 좌표들
+  double length; // 간선의 길이
 
-  Edge({required this.id, required this.startNodeId, required this.endNodeId, required this.coordinates});
+  Edge({required this.id, required this.startNodeId, required this.endNodeId, required this.coordinates, this.length=0});
 }
 
-// // 노드와 간선을 담는 데이터 구조
-// class Graph {
-//   final List<Node> nodes; // 노드 리스트
-//   final List<Edge> edges; // 간선 리스트
-//
-//   Graph({required this.nodes, required this.edges});
-// }
+// 그래프 클래스
+class Graph {
+  final List<Node> nodes; // 노드 리스트
+  final List<Edge> edges; // 간선 리스트
 
+  Graph({required this.nodes, required this.edges}) {
+    addEdgeLengths(edges);
+  }
+}
+
+// 노드 데이터
 final List<Node> nodes = [
   Node(id: '어의관', position: LatLng(37.635339, 127.076869)),
   Node(id: '국제관', position: LatLng(37.634740, 127.077435)),
+  Node(id: "창조관", position: LatLng(37.634474, 127.079266)),
+  Node(id: '다빈치관', position: LatLng(37.634559, 127.078100)),
   Node(id: '정류장', position: LatLng(37.6341, 127.0779)),
   Node(id: '창학관1', position: LatLng(37.6327, 127.0788)),
   Node(id: "창학관2", position: LatLng(37.632089, 127.079380)),
   Node(id: '하이테크관', position: LatLng(37.631937, 127.077084)),
-  Node(id: "향학로 끝", position: LatLng(37.633157, 127.077515)),
+  Node(id: "향학로 끝", position: LatLng(37.633044, 127.077491)),
   Node(id: "프론티어관", position: LatLng(37.631301, 127.076853)),
   Node(id: "창학관 사거리", position: LatLng(37.631598, 127.079166)),
-  Node(id: "계단", position: LatLng(37.631314, 127.079607)),
-  Node(id: "혜성관", position: LatLng(37.631430, 127081931)),
+  Node(id: "계단", position: LatLng(37.631325, 127.079658)),
+  Node(id: "혜성관", position: LatLng(37.631430, 127.081931)),
   Node(id: "상상관", position: LatLng(37.631078, 127.079600)),
   Node(id: "테크노큐브", position: LatLng(37.630138, 127.079445)),
   Node(id: "미래관", position: LatLng(37.629455, 127.081018)),
@@ -141,12 +149,11 @@ final List<Node> nodes = [
   Node(id: "무궁관", position: LatLng(37.631122, 127.080942)),
   Node(id: "아름관", position: LatLng(37.630108, 127.080280)),
   Node(id: "창학관", position: LatLng(37.633243, 127.080692)),
-  // 나머지 노드 데이터 추가
+  Node(id: "미래아름", position: LatLng(37.629595, 127.080141)),
 ];
 
-// 간선 데이터 전달 함수
-List<Edge> getEdgesData() {
-  return [
+// 간선 데이터
+final List<Edge> edges = [
     Edge(
       id: '어의관-국제관',
       startNodeId: '어의관',
@@ -192,7 +199,7 @@ List<Edge> getEdgesData() {
       endNodeId: '향학로 끝',
       coordinates: [
         LatLng(37.6341, 127.077916),
-        LatLng(37.633157, 127.077515),
+        LatLng(37.633044, 127.077491),
       ],
     ),
     Edge(
@@ -214,8 +221,8 @@ List<Edge> getEdgesData() {
       startNodeId: '향학로 끝',
       endNodeId: '하이테크관',
       coordinates: [
+        LatLng(37.633044, 127.077491),
         LatLng(37.631937, 127.077084),
-        LatLng(37.633157, 127.077515),
       ],
     ),
     Edge(
@@ -274,13 +281,31 @@ List<Edge> getEdgesData() {
       ],
     ),
     Edge(
-      id: '테크노큐브동-미래관',
+      id: '테크노큐브동-미래아름',
       startNodeId: '테크노큐브동',
-      endNodeId: '미래관',
+      endNodeId: '미래아름',
       coordinates: [
         LatLng(37.630138, 127.079445),
         LatLng(37.629716, 127.079381),
+        LatLng(37.629595, 127.080141),
+      ],
+    ),
+    Edge(
+      id: '미래아름-미래관',
+      startNodeId: '미래아름',
+      endNodeId: '미래관',
+      coordinates: [
+        LatLng(37.629595, 127.080141),
         LatLng(37.629455, 127.081018),
+      ],
+    ),
+    Edge(
+      id: '미래아름-아름관',
+      startNodeId: '미래아름',
+      endNodeId: '아름관',
+      coordinates: [
+        LatLng(37.629595, 127.080141),
+        LatLng(37.630108, 127.080280),
       ],
     ),
     Edge(
@@ -330,8 +355,105 @@ List<Edge> getEdgesData() {
         LatLng(37.633243, 127.080692),
       ],
     ),
-  ];
+    Edge(
+      id: '창학관1-향학로 끝',
+      startNodeId: '창학관1',
+      endNodeId: '향학로 끝',
+      coordinates: [
+        LatLng(37.6327, 127.0788),
+        LatLng(37.633044, 127.077491),
+      ],
+    ),
+];
+
+// 거리 계산 함수
+double calculateDistance(LatLng point1, LatLng point2) {
+  const double radius = 6371; // 지구의 반지름
+
+  // 라디안으로 변환
+  double lat1 = degreesToRadians(point1.latitude);
+  double lon1 = degreesToRadians(point1.longitude);
+  double lat2 = degreesToRadians(point2.latitude);
+  double lon2 = degreesToRadians(point2.longitude);
+
+  // 위도 및 경도의 차이
+  double dLat = lat2 - lat1;
+  double dLon = lon2 - lon1;
+
+  // 하버사인 공식을 사용하여 거리 계산
+  double a = sin(dLat / 2) * sin(dLat / 2) +
+  cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  double distance = radius * c;
+
+  return distance;
 }
 
-// 노드와 간선을 담은 데이터 구조 생성
-// final Graph graph = Graph(nodes: nodes, edges: edges);
+// 라디안 변환 함수
+double degreesToRadians(double degrees) {
+  return degrees * pi / 180;
+}
+
+// 간선의 길이 계산 함수
+double calculateEdgeLength(Edge edge) {
+  return edge.coordinates
+      .sublist(0, edge.coordinates.length - 1)
+      .fold<double>(0, (length, coordinate) =>
+  length +
+      calculateDistance(coordinate, edge.coordinates[edge.coordinates.indexOf(coordinate) + 1]));
+}
+
+// 간선 길이 추가함수
+void addEdgeLengths(List<Edge> edges) {
+  for (var edge in edges) {
+    edge.length = calculateEdgeLength(edge);
+  }
+}
+
+// 다익스트라
+List<Edge> dijkstra(Graph graph, String startNodeId, String endNodeId) {
+  Map<String, double?> distances = {};
+  for (var node in graph.nodes) {
+    distances[node.id] = double.infinity;
+  }
+  distances[startNodeId] = 0;
+
+  Map<String, String?> previous = {};
+
+  PriorityQueue<Node> queue = PriorityQueue((a, b) => (distances[a.id] ?? double.infinity).compareTo(distances[b.id] ?? double.infinity));
+  queue.add(graph.nodes.firstWhere((node) => node.id == startNodeId));
+
+  while (queue.isNotEmpty) {
+    Node u = queue.removeFirst();
+
+    // 도착지에 도달했을 때
+    if (u.id == endNodeId) break;
+
+    for (var edge in graph.edges.where((edge) => edge.startNodeId == u.id || edge.endNodeId == u.id)) {
+      double? alt = (distances[u.id] ?? 0) + edge.length;
+      String? neighborNodeId;
+      if (edge.startNodeId == u.id) {
+        neighborNodeId = edge.endNodeId;
+      } else {
+        neighborNodeId = edge.startNodeId;
+      }
+      if (alt < (distances[neighborNodeId] ?? 0)) {
+        distances[neighborNodeId] = alt;
+        previous[neighborNodeId] = u.id;
+        queue.add(graph.nodes.firstWhere((node) => node.id == neighborNodeId));
+      }
+    }
+  }
+
+  // 최단 경로 재구성
+  List<Edge> shortestPath = [];
+  String? currentNode = endNodeId;
+  while (previous.containsKey(currentNode)) {
+    String? previousNode = previous[currentNode];
+    Edge edge = graph.edges.firstWhere((edge) => (edge.startNodeId == previousNode && edge.endNodeId == currentNode) || (edge.endNodeId == previousNode && edge.startNodeId == currentNode));
+    shortestPath.insert(0, edge);
+    currentNode = previousNode;
+  }
+
+  return shortestPath;
+}
