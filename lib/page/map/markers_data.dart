@@ -136,20 +136,25 @@ final List<Node> nodes = [
   Node(id: '정류장', position: LatLng(37.6341, 127.0779)),
   Node(id: '창학관1', position: LatLng(37.6327, 127.0788)),
   Node(id: "창학관2", position: LatLng(37.632089, 127.079380)),
-  Node(id: '하이테크관', position: LatLng(37.631937, 127.077084)),
+  Node(id: '하이테크관', position: LatLng(37.631994, 127.077103)),
   Node(id: "향학로 끝", position: LatLng(37.633044, 127.077491)),
   Node(id: "프론티어관", position: LatLng(37.631301, 127.076853)),
   Node(id: "창학관 사거리", position: LatLng(37.631598, 127.079166)),
   Node(id: "계단", position: LatLng(37.631325, 127.079658)),
-  Node(id: "혜성관", position: LatLng(37.631430, 127.081931)),
+  Node(id: "혜성관", position: LatLng(37.631420, 127.081836)),
   Node(id: "상상관", position: LatLng(37.631078, 127.079600)),
   Node(id: "테크노큐브", position: LatLng(37.630138, 127.079445)),
   Node(id: "미래관", position: LatLng(37.629455, 127.081018)),
   Node(id: "상상무궁사이", position: LatLng(37.631160, 127.080534)),
   Node(id: "무궁관", position: LatLng(37.631122, 127.080942)),
   Node(id: "아름관", position: LatLng(37.630108, 127.080280)),
-  Node(id: "창학관", position: LatLng(37.633243, 127.080692)),
+  Node(id: "청운관", position: LatLng(37.633243, 127.080692)),
   Node(id: "미래아름", position: LatLng(37.629595, 127.080141)),
+  Node(id: "무궁관 삼거리", position: LatLng(37.631053, 127.081492)),
+  Node(id: "무궁관 다리 앞", position: LatLng(37.631002, 127.081814)),
+  Node(id: "다산-창학", position: LatLng(37.631812, 127.078466)),
+  Node(id: "창조-청운", position: LatLng(37.634158, 127.079398)),
+  Node(id: "파워플랜트", position: LatLng(37.6335, 127.07895)),
 ];
 
 // 간선 데이터
@@ -203,17 +208,47 @@ final List<Edge> edges = [
       ],
     ),
     Edge(
-      id: '정류장-창학관',
+      id: '정류장-파워플랜트',
       startNodeId: '정류장',
-      endNodeId: '창학관1',
+      endNodeId: '파워플랜트',
       coordinates: [
         LatLng(37.6341, 127.077916),
         LatLng(37.634, 127.07816),
         LatLng(37.6336, 127.07885),
         LatLng(37.6335, 127.07895),
+      ],
+    ),
+    Edge(
+      id: '파워플랜트-창학관1',
+      startNodeId: '파워플랜트',
+      endNodeId: '창학관1',
+      coordinates: [
+        LatLng(37.6335, 127.07895),
         LatLng(37.6334, 127.079),
         LatLng(37.63325, 127.079),
         LatLng(37.6327, 127.0788),
+      ],
+    ),
+    Edge(
+      id: '파워플랜트-창조-청운',
+      startNodeId: '파워플랜트',
+      endNodeId: '창조-청운',
+      coordinates: [
+        LatLng(37.6335, 127.07895),
+        LatLng(37.634158, 127.079398),
+      ],
+    ),
+    Edge(
+      id: '청운관-창조-청운',
+      startNodeId: '청운관',
+      endNodeId: '창조-청운',
+      coordinates: [
+        LatLng(37.633243, 127.080692),
+        LatLng(37.633366, 127.080210),
+        LatLng(37.633473, 127.080166),
+        LatLng(37.634245, 127.080438),
+        LatLng(37.634370, 127.079594),
+        LatLng(37.634158, 127.079398),
       ],
     ),
     Edge(
@@ -222,7 +257,7 @@ final List<Edge> edges = [
       endNodeId: '하이테크관',
       coordinates: [
         LatLng(37.633044, 127.077491),
-        LatLng(37.631937, 127.077084),
+        LatLng(37.631994, 127.077103),
       ],
     ),
     Edge(
@@ -230,18 +265,36 @@ final List<Edge> edges = [
       startNodeId: '하이테크관',
       endNodeId: '프론티어관',
       coordinates: [
-        LatLng(37.631937, 127.077084),
+        LatLng(37.631994, 127.077103),
         LatLng(37.631301, 127.076853),
       ],
     ),
     Edge(
-      id: '창학관1-창학관 사거리',
+      id: '창학관1-다산-창학',
       startNodeId: '창학관1',
-      endNodeId: '창학관 사거리',
+      endNodeId: '다산-창학',
       coordinates: [
         LatLng(37.6327, 127.0788),
         LatLng(37.631812, 127.078466),
+      ],
+    ),
+    Edge(
+      id: '다산-창학-창학관 사거리',
+      startNodeId: '다산-창학',
+      endNodeId: '창학관 사거리',
+      coordinates: [
+        LatLng(37.631812, 127.078466),
         LatLng(37.631598, 127.079166),
+      ],
+    ),
+    Edge(
+      id: '다산-창학-하이테크관',
+      startNodeId: '다산-창학',
+      endNodeId: '하이테크관',
+      coordinates: [
+        LatLng(37.631812, 127.078466),
+        LatLng(37.631989, 127.077601),
+        LatLng(37.631994, 127.077103),
       ],
     ),
     Edge(
@@ -259,7 +312,7 @@ final List<Edge> edges = [
       endNodeId: '혜성관',
       coordinates: [
         LatLng(37.631325, 127.079658),
-        LatLng(37.631430, 127.081931),
+        LatLng(37.631420, 127.081836),
       ],
     ),
     Edge(
@@ -364,6 +417,51 @@ final List<Edge> edges = [
         LatLng(37.633044, 127.077491),
       ],
     ),
+    Edge(
+        id: "무궁관-무궁관 삼거리",
+        startNodeId: "무궁관",
+        endNodeId: "무궁관 삼거리",
+        coordinates: [
+          LatLng(37.631122, 127.080942),
+          LatLng(37.631053, 127.081492),
+        ],
+    ),
+    Edge(
+      id: "미래관-무궁관 삼거리",
+      startNodeId: "미래관",
+      endNodeId: "무궁관 삼거리",
+      coordinates: [
+        LatLng(37.629455, 127.081018),
+        LatLng(37.631053, 127.081492),
+      ],
+    ),
+    Edge(
+      id: "무궁관 다리 앞-무궁관 삼거리",
+      startNodeId: "무궁관 다리 앞",
+      endNodeId: "무궁관 삼거리",
+      coordinates: [
+        LatLng(37.631002, 127.081814),
+        LatLng(37.631053, 127.081492),
+      ],
+    ),
+    Edge(
+      id: "무궁관 다리 앞-혜성관",
+      startNodeId: "무궁관 다리 앞",
+      endNodeId: "혜성관",
+      coordinates: [
+        LatLng(37.631002, 127.081814),
+        LatLng(37.631420, 127.081836),
+      ],
+    ),
+    Edge(
+      id: "창조관-창조-청운",
+      startNodeId: "창조관",
+      endNodeId: "창조-청운",
+      coordinates: [
+        LatLng(37.634158, 127.079398),
+        LatLng(37.634474, 127.079266),
+      ],
+    ),
 ];
 
 // 거리 계산 함수
@@ -398,9 +496,7 @@ double degreesToRadians(double degrees) {
 double calculateEdgeLength(Edge edge) {
   return edge.coordinates
       .sublist(0, edge.coordinates.length - 1)
-      .fold<double>(0, (length, coordinate) =>
-  length +
-      calculateDistance(coordinate, edge.coordinates[edge.coordinates.indexOf(coordinate) + 1]));
+      .fold<double>(0, (length, coordinate) => length + calculateDistance(coordinate, edge.coordinates[edge.coordinates.indexOf(coordinate) + 1]));
 }
 
 // 간선 길이 추가함수

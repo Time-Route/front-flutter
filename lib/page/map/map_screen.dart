@@ -42,34 +42,41 @@ class _MapScreenState extends State<MapScreen> {
           snippet: data['snippet'],
         ),
       );
-    }).toList();
+      }).toList();
 
-    final graph = Graph(nodes: nodes, edges: edges); // 그래프 초기화
+      final graph = Graph(nodes: nodes, edges: edges); // 그래프 초기화
 
-    // 모든 간선 표시하기
-    final List<Polyline> polylines = edges.map((edge) {
-      return Polyline(
-        polylineId: PolylineId('${edge.startNodeId}-${edge.endNodeId}'),
-        color: Colors.blue,
+      // 모든 간선 표시하기
+      final List<Polyline> polylines = edges.map((edge) {
+        return Polyline(
+          polylineId: PolylineId('${edge.startNodeId}-${edge.endNodeId}'),
+          color: Colors.blue,
         points: edge.coordinates,
         width: 8,
       );
     }).toList();
 
 
-    String startNodeId = '미래관';
-    String endNodeId = '다빈치관';
+    String startNodeId = '청운관';
+    String endNodeId = '어의관';
 
     List<Edge> shortestPath = dijkstra(graph, startNodeId, endNodeId);
+
 
     if (shortestPath.isNotEmpty) {
       print('Shortest path from $startNodeId to $endNodeId:');
       double totalDistance = 0;
       for (var edge in shortestPath) {
-        print('${edge.startNodeId} to ${edge.endNodeId}: ${edge.length} km');
+        print('${edge.startNodeId} to ${edge.endNodeId}: ${(edge.length * 1000).toInt()}m');
         totalDistance += edge.length;
       }
-      print('Total distance: $totalDistance km');
+      // 평균 걷는 속도 설정 (시속 5km)
+      double speed = 5.0;
+      double distance = totalDistance * 1000;
+      int travelTimeInMinutes = (distance / (speed * 1000 / 60)).toInt();
+
+      print('총 거리: ${(totalDistance * 1000).toInt()}m');
+      print('예상시간: ${travelTimeInMinutes}분');
     } else {
       print('No path found from $startNodeId to $endNodeId');
     }
