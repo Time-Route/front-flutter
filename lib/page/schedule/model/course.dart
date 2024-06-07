@@ -1,9 +1,9 @@
 import 'package:timeroute/page/schedule/model/schedule.dart';
 
 class Course {
-  final int? no;
+  final int no;
   final int? courseCode;
-  final String? courseName;
+  final String courseName;
   final int? courseNumber;
   final String? courseType;
   final double? credit;
@@ -99,7 +99,7 @@ class Course {
       classification: json['구분'],
       theory: json['이론'],
       practice: json['실습'],
-      schedules: json['schedules'].map<Schedule>((e) => Schedule.fromJson(e)).toList(),
+      schedules: json['schedules'].map<Schedule>((e) => Schedule.fromJson(json['No'], e)).toList(),
     );
   }
 }

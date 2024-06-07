@@ -18,10 +18,24 @@ class Courseontroller extends GetxController {
     dio = Dio();
   }
 
-  void fetchSchedule() async {
+  void fetchSchedule({
+    required String courseName,
+    required String day,
+    required int start,
+    required int end,
+    required int credits,
+  }) async {
     try {
       isLoading.value = true;
-      final response = await dio.get("${dotenv.env['BASE_URL']}/api/timetable/?course=인공지능");
+      String requestUrl = "${dotenv.env['BASE_URL']}/api/timetable/?";
+      if (courseName.isNotEmpty) requestUrl += "course=$courseName&";
+      if (day.isNotEmpty) requestUrl += "weekday=$day&";
+      if (start != 0) requestUrl += "start=$start&";
+      if (end != 0) requestUrl += "end=$end&";
+      if (credits != 0) requestUrl += "credits=$credits&";
+      log(requestUrl);
+
+      final response = await dio.get(requestUrl);
       List<dynamic> jsonList = response.data;
       courses.value = jsonList.map((e) => Course.fromJson(e)).toList();
     } catch (e) {

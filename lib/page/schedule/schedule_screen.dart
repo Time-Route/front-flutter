@@ -1,12 +1,8 @@
-import 'dart:developer';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:timeroute/page/schedule/model/course.dart';
-import 'package:timeroute/page/schedule/model/schedule.dart';
 import 'package:timeroute/page/schedule/widgets/course_list_widget.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'controllers/course_controller.dart';
 import 'controllers/schedule_controller.dart';
@@ -17,7 +13,20 @@ List<String> week = [
   '화',
   '수',
   '목',
-  '금'
+  '금',
+  '토',
+  '일',
+];
+
+final selectDayList = [
+  '모두',
+  '월',
+  '화',
+  '수',
+  '목',
+  '금',
+  '토',
+  '일'
 ];
 
 class ScheduleScreen extends StatefulWidget {
@@ -30,17 +39,23 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final courseController = Get.put(Courseontroller());
   final scheduleController = Get.put(ScheduleController());
-  // 왼쪽 사이드
-  String _selectedTitle = week[0]; // Default title
-  int _startNumber = 0;
-  int _endNumber = 0;
+
+  // 요일
+  String _selectedDay = selectDayList[0];
+
+  // 학점
+  int _credits = 0;
+
+  final courseNameController = TextEditingController();
+  final startInputController = TextEditingController();
+  final endInputController = TextEditingController();
 
   List<Course> courses = [];
 
   // Function to handle title selection
-  void _onTitleSelected(String? title) {
+  void _onDaySelected(String? title) {
     setState(() {
-      _selectedTitle = title!;
+      _selectedDay = title!;
     });
   }
 
@@ -66,68 +81,104 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              '시작 교시',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            // 교과목명 검색
             TextField(
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  _startNumber = int.tryParse(value) ?? 0;
-                });
-              },
+              controller: courseNameController,
+              decoration: InputDecoration(
+                hintText: '교과목명을 입력하세요',
+              ),
             ),
-            SizedBox(height: 10),
-            Text(
-              '종료 교시',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(height: 16),
+            // 요일
+            Text('요일'),
+            // 요일 선택
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: selectDayList
+                  .map((title) => ChoiceChip(
+                        label: Text(title),
+                        selected: _selectedDay == title,
+                        onSelected: (selected) {
+                          _onDaySelected(selected ? title : null);
+                        },
+                      ))
+                  .toList(),
             ),
-            TextField(
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  _endNumber = int.tryParse(value) ?? 0;
-                });
-              },
-            ),
-            SizedBox(height: 10),
-            Text(
-              '제목:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            DropdownButton<String>(
-              value: _selectedTitle,
-              onChanged: _onTitleSelected,
-              items: week.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
+            SizedBox(height: 16),
+            // 학점
+            Text('학점'),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: List.generate(5, (index) {
+                return ChoiceChip(
+                  label: Text(index.toString()),
+                  selected: _credits == index,
+                  onSelected: (selected) {
+                    setState(() {
+                      _credits = selected ? index : 0;
+                    });
+                  },
                 );
-              }).toList(),
+              }),
             ),
-            TextButton(
+            SizedBox(height: 16),
+            Text('시작 교시'),
+            TextField(
+              controller: startInputController,
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
+            ),
+            SizedBox(height: 16),
+            Text('종료 교시'),
+            TextField(
+              controller: endInputController,
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
+            ),
+            SizedBox(height: 16),
+
+            // 불러오기 버튼 (색상 보라색)
+            ElevatedButton(
               onPressed: () {
-                // addSchedule(
-                //   dayOfWeek: week.indexOf(_selectedTitle),
-                //   startPeriod: _startNumber - 1,
-                //   endPeriod: _endNumber - 1,
-                // );
+                if (courseNameController.text.isEmpty) {
+                  Get.snackbar(
+                    '알림',
+                    '교과목명을 입력하세요',
+                    duration: 1.seconds,
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.lightBlue,
+                  );
+                  return;
+                }
+
+                courseController.fetchSchedule(
+                  courseName: courseNameController.text,
+                  day: _selectedDay == '모두' ? '' : _selectedDay,
+                  start: startInputController.text.isEmpty ? 0 : int.parse(startInputController.text),
+                  end: endInputController.text.isEmpty ? 0 : int.parse(endInputController.text),
+                  credits: _credits,
+                );
               },
-              child: Text('추가하기'),
+              style: ButtonStyle(),
+              child: Text('불러오기'),
             ),
-            TextButton(
-                onPressed: () {
-                  courseController.fetchSchedule();
-                },
-                child: Text('불러오기')),
-            Obx(() {
-              if (courseController.isLoading.value) {
-                return CircularProgressIndicator();
-              } else {
-                return CourseListWidget(courses: courseController.courses);
-              }
-            }),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Obx(() {
+                  if (courseController.isLoading.value) {
+                    return CircularProgressIndicator();
+                  } else {
+                    return CourseListWidget(courses: courseController.courses);
+                  }
+                }),
+              ),
+            ),
           ],
         ),
       ),
